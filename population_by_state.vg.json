@@ -1,0 +1,110 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": {
+  "text": "Malaysia States Population (2022)",
+  "subtitle": "Selangor leads with over 7 million people, while Labuan has fewer than 100,000",
+  "anchor": "start",
+  "fontSize": 20
+},
+  "width": 800,
+  "height": 600,
+  "projection": {
+    "type": "mercator",
+    "fit": true,
+    "center": [
+      110,
+      4
+    ],
+    "scale": 1800
+  },
+  "layer": [
+    {
+      "data": {
+        "sphere": true
+      },
+      "mark": {
+        "type": "geoshape",
+        "fill": "#b1ccdf",
+        "stroke": null
+      }
+    },
+    {
+      "data": {
+        "graticule": {
+          "step": [
+            4,
+            4
+          ]
+        }
+      },
+      "mark": {
+        "type": "geoshape",
+        "stroke": "#9b9d9c",
+        "strokeWidth": 0.5
+      }
+    },
+    {
+      "data": {
+        "url": "https://gist.githubusercontent.com/deenaixr/c5743939746bf07dccbe6d9f29240ce4/raw/396e4ae43f53e8c6e7610786aecbea1e269650ab/malaysia.topojson",
+        "format": {
+          "type": "topojson",
+          "feature": "ne_10m_admin_1_states_provinces"
+        }
+      },
+      "transform": [
+        {
+          "filter": "datum.properties.admin == 'Malaysia'"
+        },
+        {
+          "lookup": "properties.name",
+          "from": {
+            "data": {
+              "url": "https://gist.githubusercontent.com/deenaixr/0f2f50b3713e7240934c68fb87623098/raw/178bebdda0c28f0c2651703f2f0db0c1d9ab9e4f/population_state_2022_renamed.csv",
+              "format": {
+                "type": "csv"
+              }
+            },
+            "key": "state",
+            "fields": [
+              "year",
+              "population_000"
+            ]
+          }
+        }
+      ],
+      "mark": {
+        "type": "geoshape",
+        "stroke": "#333",
+        "strokeWidth": 0.8
+      },
+      "encoding": {
+        "color": {
+          "field": "population_000",
+          "type": "quantitative",
+          "title": "Population (thousands)",
+          "scale": {
+            "scheme": "redyellowblue",
+            "count": 9
+          }
+        },
+        "tooltip": [
+          {
+            "field": "properties.name",
+            "type": "nominal",
+            "title": "State"
+          },
+          {
+            "field": "year",
+            "type": "ordinal",
+            "title": "Year"
+          },
+          {
+            "field": "population_000",
+            "type": "quantitative",
+            "title": "Population (000)"
+          }
+        ]
+      }
+    }
+  ]
+}
