@@ -88,7 +88,8 @@
     {
       "title": {
         "text": "Mean Household Income by State",
-        "subtitle": "Choose a year using the dropdown below the bar chart. Data only available for selected years (based on dataset). The first dashed line indicates the min income of the year and the second dashed line is the max income of the year.",
+        "subtitle": ["Choose a year using the dropdown below the bar chart. Data only available for selected years (based on dataset).", 
+          "Note: The first dashed line indicates the min income of the year and the second dashed line is the max income of the year."],
         "anchor": "start",
         "fontSize": 20,
         "dx": 108
