@@ -20,7 +20,7 @@
     },
     {
       "data": {
-        "url": "malaysia_neighbours.json",
+        "url": "https://gist.githubusercontent.com/deenaixr/f61223dd0f316baff985361081587410/raw/ac6399fc99052a7ced473c93d7209483088416e2/malaysia_neighbours.json",
         "format": { "type": "topojson", "feature": "malaysia_neighbours" }
       },
       "transform": [{ "filter": "datum.properties.admin != 'Malaysia'" }],
