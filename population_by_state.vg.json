@@ -139,8 +139,7 @@
           "mark": { "type": "text", "dx": 6, "dy": -6, "fontSize": 11, "fontWeight": "bold" },
           "encoding": {
             "x": { "field": "min_income", "type": "quantitative" },
-            "y": { "value": 0 },
-            "text": { "expr": "'Min: ' + format(datum.min_income, ',.0f')" }
+            "y": { "value": 0 }
           }
         },
 
@@ -158,9 +157,7 @@
           "mark": { "type": "text", "dx": 6, "dy": -6, "fontSize": 11, "fontWeight": "bold" },
           "encoding": {
             "x": { "field": "max_income", "type": "quantitative" },
-            "y": { "value": 0 },
-            "text": { "expr": "'Max: ' + format(datum.max_income, ',.0f')" }
-          }
+            "y": { "value": 0 }          }
         }
       ]
     }
