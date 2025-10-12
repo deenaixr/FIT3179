@@ -1,68 +1,168 @@
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-  "title": {
-    "text": "Malaysia States Population (2022)",
-    "subtitle": "Coloured by share of Malaysia’s total population (%)",
-    "anchor": "start",
-    "fontSize": 20
-  },
-  "width": 800,
-  "height": 600,
-  "projection": { "type": "mercator", "center": [112, 4], "scale": 1800 },
-  "layer": [
+
+  "params": [
     {
-      "data": { "sphere": true },
-      "mark": { "type": "geoshape", "fill": "#b1ccdf", "stroke": null }
-    },
+      "name": "Year",
+      "value": 2022,
+      "bind": {
+        "input": "select",
+        "name": "Year: ",
+        "options": [1970,1974,1976,1979,1984,1987,1989,1992,1995,1997,1999,2002,2004,2007,2009,2012,2014,2016,2019,2020,2022]
+      }
+    }
+  ],
+
+  "vconcat": [
     {
-      "data": { "graticule": { "step": [4, 4] } },
-      "mark": { "type": "geoshape", "stroke": "#9b9d9c", "strokeWidth": 0.5 }
-    },
-    {
-      "data": {
-        "url": "https://gist.githubusercontent.com/deenaixr/f61223dd0f316baff985361081587410/raw/ac6399fc99052a7ced473c93d7209483088416e2/malaysia_neighbours.json",
-        "format": { "type": "topojson", "feature": "malaysia_neighbours" }
+      "title": {
+        "text": "Malaysia States Population (2022)",
+        "subtitle": "Coloured by share of Malaysia’s total population (%)",
+        "anchor": "start",
+        "fontSize": 20
       },
-      "transform": [{ "filter": "datum.properties.admin != 'Malaysia'" }],
-      "mark": { "type": "geoshape", "fill": "#e0e0e0", "stroke": "#aaa", "strokeWidth": 0.5 }
+      "width": 800,
+      "height": 600,
+      "padding": { "right": 120, "bottom": 40 },
+      "projection": { "type": "mercator", "center": [110, 12], "scale": 2000 },
+      "layer": [
+        { "data": { "sphere": true }, "mark": { "type": "geoshape", "fill": "#b1ccdf", "stroke": null } },
+        { "data": { "graticule": { "step": [4, 4] } }, "mark": { "type": "geoshape", "stroke": "#9b9d9c", "strokeWidth": 0.5 } },
+        {
+          "data": {
+            "url": "https://gist.githubusercontent.com/deenaixr/f61223dd0f316baff985361081587410/raw/ac6399fc99052a7ced473c93d7209483088416e2/malaysia_neighbours.json",
+            "format": { "type": "topojson", "feature": "malaysia_neighbours" }
+          },
+          "transform": [{ "filter": "datum.properties.admin != 'Malaysia'" }],
+          "mark": { "type": "geoshape", "fill": "#e0e0e0", "stroke": "#aaa", "strokeWidth": 0.5 }
+        },
+        {
+          "data": {
+            "url": "https://gist.githubusercontent.com/deenaixr/c5743939746bf07dccbe6d9f29240ce4/raw/396e4ae43f53e8c6e7610786aecbea1e269650ab/malaysia.topojson",
+            "format": { "type": "topojson", "feature": "ne_10m_admin_1_states_provinces" }
+          },
+          "transform": [
+            { "filter": "datum.properties.admin == 'Malaysia'" },
+            {
+              "lookup": "properties.name",
+              "from": {
+                "data": {
+                  "url": "https://gist.githubusercontent.com/deenaixr/0f2f50b3713e7240934c68fb87623098/raw/178bebdda0c28f0c2651703f2f0db0c1d9ab9e4f/population_state_2022_renamed.csv",
+                  "format": { "type": "csv" }
+                },
+                "key": "state",
+                "fields": ["year", "population_000"]
+              }
+            },
+            { "filter": "datum.year == 2022" },
+            { "joinaggregate": [{ "op": "sum", "field": "population_000", "as": "total_pop_000" }] },
+            { "calculate": "datum.population_000 / datum.total_pop_000 * 100", "as": "share_pct" }
+          ],
+          "mark": { "type": "geoshape", "stroke": "#333", "strokeWidth": 0.8 },
+          "encoding": {
+            "color": {
+              "field": "share_pct",
+              "type": "quantitative",
+              "title": "Share of Malaysia (%)",
+              "format": ".1f",
+              "scale": { "domain": [0, 20], "nice": false, "scheme": "greenblue" },
+              "legend": {
+                "orient": "right",
+                "direction": "vertical",
+                "gradientLength": 300,
+                "gradientThickness": 12,
+                "values": [0, 5, 10, 15, 20]
+              }
+            },
+            "tooltip": [
+              { "field": "properties.name", "title": "State" },
+              { "field": "population_000", "title": "Population (000)" },
+              { "field": "share_pct", "title": "Share (%)", "format": ".2f" },
+              { "field": "year", "title": "Year" }
+            ]
+          }
+        }
+      ]
     },
+
     {
+      "title": {
+        "text": "Mean Household Income by State",
+        "subtitle": "Choose a year using the dropdown below the bar chart. Data only available for selected years (based on dataset).",
+        "anchor": "start",
+        "fontSize": 20,
+        "dx": 108
+      },
+      "width": 800,
+      "height": 380,
       "data": {
-        "url": "https://gist.githubusercontent.com/deenaixr/c5743939746bf07dccbe6d9f29240ce4/raw/396e4ae43f53e8c6e7610786aecbea1e269650ab/malaysia.topojson",
-        "format": { "type": "topojson", "feature": "ne_10m_admin_1_states_provinces" }
+        "url": "https://gist.githubusercontent.com/deenaixr/233c6cc1214bb16a02860fbca7180163/raw/454ff5de1d68c7c3e1bab776b4f8e4f4e5972eca/hh_income_state.csv",
+        "format": { "type": "csv" }
       },
       "transform": [
-        { "filter": "datum.properties.admin == 'Malaysia'" },
+        { "calculate": "toNumber(timeFormat(toDate(datum.date), '%Y'))", "as": "year_num" },
+        { "filter": "datum.year_num == Year" },
+        { "calculate": "toNumber(datum.income_mean)", "as": "income_val" }
+      ],
+      "layer": [
         {
-          "lookup": "properties.name",
-          "from": {
-            "data": {
-              "url": "https://gist.githubusercontent.com/deenaixr/0f2f50b3713e7240934c68fb87623098/raw/178bebdda0c28f0c2651703f2f0db0c1d9ab9e4f/population_state_2022_renamed.csv",
-              "format": { "type": "csv" }
+          "mark": "bar",
+          "encoding": {
+            "y": { "field": "state", "type": "nominal", "sort": "-x", "title": "State" },
+            "x": {
+              "field": "income_val",
+              "type": "quantitative",
+              "title": { "expr": "'Mean household income (RM) — ' + Year" },
+              "axis": { "format": ",.0f" },
+              "scale": { "domain": [0, 14000] }
             },
-            "key": "state",
-            "fields": ["year", "population_000"]
+            "color": { "value": "#0ea5e9" },
+            "tooltip": [
+              { "field": "state", "title": "State" },
+              { "field": "income_val", "title": "Mean income (RM)", "format": ",.0f" },
+              { "field": "year_num", "title": "Year" }
+            ]
           }
         },
-        { "joinaggregate": [{ "op": "sum", "field": "population_000", "as": "total_pop_000" }] },
-        { "calculate": "datum.population_000 / datum.total_pop_000 * 100", "as": "share_pct" }
-      ],
-      "mark": { "type": "geoshape", "stroke": "#333", "strokeWidth": 0.8 },
-      "encoding": {
-        "color": {
-          "field": "share_pct",
-          "type": "quantitative",
-          "title": "Share of Malaysia (%)",
-          "format": ".1f",
-          "scale": { "scheme": "greenblue" }
+
+        {
+          "transform": [
+            { "aggregate": [{ "op": "min", "field": "income_val", "as": "min_income" }] }
+          ],
+          "mark": { "type": "rule", "stroke": "#111", "strokeDash": [4, 2] },
+          "encoding": { "x": { "field": "min_income", "type": "quantitative" } }
         },
-        "tooltip": [
-          { "field": "properties.name", "type": "nominal", "title": "State" },
-          { "field": "population_000", "type": "quantitative", "title": "Population (000)" },
-          { "field": "share_pct", "type": "quantitative", "title": "Share (%)", "format": ".2f" },
-          { "field": "year", "type": "ordinal", "title": "Year" }
-        ]
-      }
+        {
+          "transform": [
+            { "aggregate": [{ "op": "min", "field": "income_val", "as": "min_income" }] }
+          ],
+          "mark": { "type": "text", "dx": 6, "dy": -6, "fontSize": 11, "fontWeight": "bold" },
+          "encoding": {
+            "x": { "field": "min_income", "type": "quantitative" },
+            "y": { "value": 0 },
+            "text": { "expr": "'Min: ' + format(datum.min_income, ',.0f')" }
+          }
+        },
+
+        {
+          "transform": [
+            { "aggregate": [{ "op": "max", "field": "income_val", "as": "max_income" }] }
+          ],
+          "mark": { "type": "rule", "stroke": "#111", "strokeDash": [4, 2] },
+          "encoding": { "x": { "field": "max_income", "type": "quantitative" } }
+        },
+        {
+          "transform": [
+            { "aggregate": [{ "op": "max", "field": "income_val", "as": "max_income" }] }
+          ],
+          "mark": { "type": "text", "dx": 6, "dy": -6, "fontSize": 11, "fontWeight": "bold" },
+          "encoding": {
+            "x": { "field": "max_income", "type": "quantitative" },
+            "y": { "value": 0 },
+            "text": { "expr": "'Max: ' + format(datum.max_income, ',.0f')" }
+          }
+        }
+      ]
     }
   ]
 }
