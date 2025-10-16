@@ -1,22 +1,159 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <script src="https://cdn.jsdelivr.net/npm/vega@5.20.2"></script>
-  <script src="https://cdn.jsdelivr.net/npm/vega-lite@5.1.0"></script>
-  <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.17.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega@5.30.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-lite@5.17.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.24.0"></script>
 
-  <script src="vega_lite_vis.js"></script>
-  
-  <title>Malaysia Population Map</title>
+  <title>Mapping Malaysians: From Population to Prosperity & Poverty</title>
+
+  <style>
+    :root{
+      --chart-w: 920px;           
+      --hero-bg: #dbdde0;         /* box background */
+      --hero-border: #0c0c0c;     /* box border */
+      --hero-shadow: 0 6px 18px rgba(15, 23, 42, .08);
+      --accent: #1b6181;          /* color on the left */
+    }
+
+    /* Title box */
+    .hero{
+      width: var(--chart-w);
+      max-width: 95vw;
+      margin: 22px auto 14px;
+      padding: 20px 28px;
+      background: var(--hero-bg);
+      border: 1px solid var(--hero-border);
+      border-radius: 14px;
+      box-shadow: var(--hero-shadow);
+      position: relative;
+    }
+
+    /* Optional accent bar on the left */
+    .hero::before{
+      content: "";
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 6px;
+      border-top-left-radius: 14px;
+      border-bottom-left-radius: 14px;
+      background: var(--accent);
+    }
+
+    /* Page heading */
+    h1.page-title{
+      text-align: center;
+      font-size: clamp(32px, 4vw, 44px);
+      margin: 18px auto 6px;
+      width: var(--chart-w);
+      max-width: 95vw;
+    }
+    .page-subtitle{
+      text-align: center;
+      font-size: clamp(16px, 2vw, 20px);
+      margin: 0 auto 22px;
+      width: var(--chart-w);
+      max-width: 95vw;
+      color: #434545;
+    }
+
+    .intro-tight{
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+      font-size: clamp(14px, 2vw, 18px);
+      max-width: 50ch;          /* ~10 words per line */
+      margin: 12px auto 22px;   /* center + spacing */
+      text-align: center;
+      line-height: 1.6;
+      color: #334155;
+    }
+    
+      .intro-tight strong { font-weight: 700; }
+
+    .section{
+      width: var(--chart-w);
+      max-width: 95vw;
+      margin: 0 auto 24px; 
+    }
+
+    #map, #combo, #smallMultiples{
+      width: 100%;
+    }
+
+    #map > div,
+    #combo > div,
+    #smallMultiples > div{
+      margin: 0 auto !important;
+      max-width: 100%;
+      display: block;
+    }
+
+    #mapBindings, #comboBindings{
+      width: var(--chart-w);
+      max-width: 95vw;
+      margin: 8px auto 14px;
+    }
+    #mapBindings .vega-bindings label,
+    #comboBindings .vega-bindings label{
+      display: block;
+      font-weight: 600;
+      margin: 0 0 6px 0;
+    }
+    #mapBindings input[type="range"],
+    #comboBindings input[type="range"]{
+      width: 100%;
+    }
+
+    .vega-actions{ display: none !important; }
+  </style>
+
+  <script src="vega_lite_vis.js" defer></script>
 </head>
-
 <body>
-  <div id="map"></div>
+  <header class="hero">
+    <h1 class="page-title">Mapping Malaysians: From Population to Prosperity & Poverty</h1>
+    <p class="page-subtitle">Discover more about Malaysia's population distribution, income, and poverty over time.</p>
+  </header>
 
+  <section id="mapIntro" class="intro-tight">
+    <p>
+      The population of Malaysia has yet to be able to grow evenly. 
+      Jobs and modernisation have caused citizens to migrate to a few hubs 
+      over time. The map shows <strong>each of the state’s share of the 
+      population</strong> in percentage. Darker shades mean a larger share.
+      Select a year from the dropdown option to see how the population
+      distribution has changed over time.
+    </p>
+  </section>
+
+  <!-- MAP -->
+  <div class="section">
+    <div id="map"></div>
+    <div id="mapBindings"></div>
+  </div>
+
+  <section class="intro-tight">
+    <p>
+      We have seen how all the people are spread across states. Now,
+      we are going to <strong>explore whether income growth is influenced by poverty.</strong>
+      Pick a year in the dropdown option, it will change both the bar chart and scatter plot to that year.
+      Compare the bar chart and the scatter,
+      and observe how higher incomes often pair with lower poverty.
+    </p>
+  </section>
+
+  <!-- Income (bar) + Poverty (scatter) -->
+  <div class="section">
+    <div id="combo"></div>
+    <div id="comboBindings"></div>
+  </div>
+
+  <!-- SMALL MULTIPLES: Poverty over time (6 states) -->
+  <div class="section">
+    <div id="smallMultiples"></div>
+  </div>
 </body>
 </html>
