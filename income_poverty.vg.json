@@ -1,0 +1,119 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+
+  "title": {
+    "text": "Income & Poverty by States in Malaysia (1970–2022)",
+    "subtitle": "Only selected years available (based on dataset)",
+    "anchor": "start",
+    "fontSize": 20,
+    "subtitleFontSize": 14,
+    "offset": 15
+  },
+
+  "params": [
+    {
+      "name": "Year",
+      "value": 2022,
+      "bind": {
+        "input": "select",
+        "name": "Year: ",
+        "options": [1970,1976,1979,1984,1987,1989,1992,1995,1997,1999,2002,2004,2007,2009,2012,2014,2016,2019,2020,2022]
+      }
+    }
+  ],
+
+  "hconcat": [
+    {
+      "title": "Mean Household Income by State",
+      "width": 380,
+      "height": 380,
+      "data": {
+        "url": "https://gist.githubusercontent.com/deenaixr/233c6cc1214bb16a02860fbca7180163/raw/8f26b3cdbbc9dc9c8a54c7a8c091f81c07316b37/hh_income_state.csv"
+      },
+      "transform": [
+        { "calculate": "isValid(datum.year) ? toNumber(datum.year) : toNumber(timeFormat(toDate(datum.date), '%Y'))", "as": "year_num" },
+        { "filter": "datum.year_num == Year" },
+        { "calculate": "toNumber(replace(datum.income_mean, /,/g, ''))", "as": "income_val" }
+      ],
+      "mark": "bar",
+      "encoding": {
+        "y": { "field": "state", "type": "nominal", "title": "State", "sort": "-x" },
+        "x": {
+          "field": "income_val", "type": "quantitative",
+          "title": "Mean household income (RM)",
+          "axis": { "format": ",.0f" },
+          "scale": { "domain": [0, 14000] }
+        },
+        "color": { "value": "#0ea5e9" },
+        "tooltip": [
+          { "field": "state", "title": "State" },
+          { "field": "income_val", "title": "Income (RM)", "format": ",.0f" },
+          { "field": "year_num", "title": "Year" }
+        ]
+      }
+    },
+
+    {
+      "title": "Income vs Poverty (same Year)",
+      "width": 380,
+      "height": 380,
+      "data": {
+        "url": "https://gist.githubusercontent.com/deenaixr/233c6cc1214bb16a02860fbca7180163/raw/8f26b3cdbbc9dc9c8a54c7a8c091f81c07316b37/hh_income_state.csv"
+      },
+      "transform": [
+        { "calculate": "isValid(datum.year) ? toNumber(datum.year) : toNumber(timeFormat(toDate(datum.date), '%Y'))", "as": "year_num" },
+        { "filter": "datum.year_num == Year" },
+        { "calculate": "isValid(datum.k) ? datum.k : datum.state + '|' + toString(Year)", "as": "k_join" },
+        {
+          "lookup": "k_join",
+          "from": {
+            "data": { "url": "https://gist.githubusercontent.com/deenaixr/bacb6d3ab563650a0f1a778a0679cca7/raw/ec44c7ff429e64710f3b94f6f6782fa3e082af7a/hh_poverty_state.csv" },
+            "key": "k",
+            "fields": ["poverty_absolute"]
+          }
+        },
+        { "calculate": "toNumber(replace(datum.income_mean, /,/g, ''))", "as": "income_val" },
+        { "calculate": "toNumber(datum.poverty_absolute)", "as": "poverty_abs_val" },
+        { "filter": "isValid(datum.income_val) && isValid(datum.poverty_abs_val)" },
+        { "joinaggregate": [{ "op": "count", "as": "row_count" }] }
+      ],
+      "layer": [
+        {
+          "mark": { "type": "point", "filled": true, "size": 90 },
+          "encoding": {
+            "x": {
+              "field": "income_val", "type": "quantitative",
+              "title": "Mean household income (RM)",
+              "axis": { "format": ",.0f" },
+              "scale": { "domain": [0, 14000] }
+            },
+            "y": {
+              "field": "poverty_abs_val", "type": "quantitative",
+              "title": "Poverty rate (absolute, %)",
+              "scale": { "domain": [0, 100] }
+            },
+            "tooltip": [
+              { "field": "state", "title": "State" },
+              { "field": "year_num", "title": "Year" },
+              { "field": "income_val", "title": "Income (RM)", "format": ",.0f" },
+              { "field": "poverty_abs_val", "title": "Poverty (%)", "format": ".1f" }
+            ]
+          }
+        },
+        {
+          "transform": [
+            { "filter": "datum.row_count >= 2" },
+            { "regression": "poverty_abs_val", "on": "income_val" }
+          ],
+          "mark": { "type": "line", "strokeDash": [4, 2], "color": "#111" },
+          "encoding": {
+            "x": { "field": "income_val", "type": "quantitative" },
+            "y": { "field": "poverty_abs_val", "type": "quantitative" }
+          }
+        }
+      ]
+    }
+  ],
+
+  "config": { "view": { "stroke": null } }
+}

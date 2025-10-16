@@ -1,0 +1,75 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "background": "#ffffff",
+    "config": {
+    "view": { "stroke": null },              
+    "axis": {
+        "gridColor": "#e5e7eb",
+        "domainColor": "#9ca3af",
+        "labelColor": "#374151",
+        "titleColor": "#111827"
+    },
+  "legend": { "labelColor": "#374151", "titleColor": "#111827" },
+  "title":  { "color": "#111827" }
+},
+  "title": {
+    "text": "Absolute poverty rate over time for different states",
+    "subtitle": "Poverty rate (%) along the years (1970–2022) for Selangor, Johor, Sabah, Sarawak, Pulau Pinang, Kuala Lumpur",
+    "anchor": "start",
+    "fontSize": 20,
+    "subtitleFontSize": 14,
+    "offset": 15
+  },
+
+  "data": {
+    "url": "https://gist.githubusercontent.com/deenaixr/bacb6d3ab563650a0f1a778a0679cca7/raw/ec44c7ff429e64710f3b94f6f6782fa3e082af7a/hh_poverty_state.csv",
+    "format": { "type": "csv" }
+  },
+
+  "transform": [
+    { "filter": {"field": "state", "oneOf": ["Selangor","Johor","Sabah","Sarawak","Pulau Pinang","W.P. Kuala Lumpur"]} },
+    { "calculate": "isValid(datum.year) ? toNumber(datum.year) : toNumber(timeFormat(toDate(datum.date), '%Y'))", "as": "year_num" },
+    { "calculate": "toNumber(datum.poverty_absolute)", "as": "poverty_val" }
+  ],
+
+  "facet": {
+    "field": "state",
+    "type": "nominal",
+    "sort": ["Selangor","Johor","Sabah","Sarawak","Pulau Pinang","W.P. Kuala Lumpur"]
+  },
+  "columns": 3,
+  "spacing": 16,
+
+  "spec": {
+    "width": 290,
+    "height": 150,
+    "layer": [
+      {
+        "mark": {"type": "line", "point": true},
+        "encoding": {
+          "x": {
+            "field": "year_num",
+            "type": "quantitative",
+            "title": "Year",
+            "axis": {"format": "d", "tickCount": 6, "labelOverlap": true}
+          },
+          "y": {
+            "field": "poverty_val",
+            "type": "quantitative",
+            "title": "Poverty rate (%)",
+            "scale": {"domain": [0, 60]}
+          },
+          "tooltip": [
+            {"field": "state", "title": "State"},
+            {"field": "year_num", "title": "Year"},
+            {"field": "poverty_val", "title": "Poverty (%)", "format": ".1f"}
+          ]
+        }
+      }
+    ]
+  },
+
+  "config": {
+    "view": {"stroke": null}
+  }
+}
